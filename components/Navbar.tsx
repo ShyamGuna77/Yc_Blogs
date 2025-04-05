@@ -1,12 +1,13 @@
 import Link from 'next/link';
-import React from 'react'
+import React from 'react';
 import Image from 'next/image';
-import { auth,signIn,signOut } from '@/auth';
+import { auth, signIn, signOut } from '@/auth';
 import { BadgePlus, LogOut } from 'lucide-react';
-import { redirect } from 'next/dist/server/api-utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 
 const Navbar = async () => {
-  const session = await auth()
+  const session = await auth();
+
   return (
     <header className="px-5 py-3 bg-white shadow-sm font-work-sans">
       <nav className="flex justify-between items-center">
@@ -18,27 +19,33 @@ const Navbar = async () => {
           {session && session?.user ? (
             <>
               <Link href="/startup/create">
-                <span className="max-sm:hidden">Create</span>
-                <BadgePlus className="size-6 sm:hidden" />
+                <span className="hidden sm:inline">Create</span>
+                <BadgePlus className="w-6 h-6 sm:hidden" />
               </Link>
-              <form
-                action={async () => {
-                  "use server";
-                }}
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-2"
               >
-                <button type="submit">
-                  <span className="max-sm:hidden">Logout</span>
-                  <LogOut className="size-6 sm:hidden text-red-500" />
-                </button>
-              </form>
+                <span className="hidden sm:inline">Logout</span>
+                <LogOut className="w-6 h-6 text-red-500 sm:hidden" />
+              </button>
+              <Link href={`/user/${session?.user?.id}`}>
+                <Avatar className="w-10 h-10">
+                  <AvatarImage
+                    src={session?.user?.image || ""}
+                    alt={session?.user?.name || ""}
+                  />
+                  <AvatarFallback>AV</AvatarFallback>
+                </Avatar>
+              </Link>
             </>
           ) : (
-            <form></form>
+            <button onClick={() => signIn()}>Login</button>
           )}
         </div>
       </nav>
     </header>
   );
-}
+};
 
-export default Navbar
+export default Navbar;
